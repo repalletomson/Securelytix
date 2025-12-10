@@ -16,96 +16,44 @@ class PIIDetector:
     def __init__(self):
         # Common name patterns and indicators
         self.name_patterns = [
-            r'\b(?:Mr|Mrs|Ms|Dr|Doctor|Patient)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\b',
-            r'\bName:\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\b',
-            r'\bPatient:\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\b',
+            r'\b(?:Mr\.?|Mrs\.?|Ms\.?|Dr\.?|Doctor)\s+([A-Z][a-z]+\s+[A-Z][a-z]+)\b',
+            r'\bPatient:\s*([A-Z][a-z]+\s+[A-Z][a-z]+)\b',
+            r'\bName:\s*([A-Z][a-z]+\s+[A-Z][a-z]+)\b',
             r'\b([A-Z][a-z]+\s+[A-Z][a-z]+)\b(?=\s*(?:DOB|Age|Born))',  # Name before DOB/Age
+            r'\b([A-Z][a-z]{2,}\s+[A-Z][a-z]{2,})\b',  # General two-word capitalized names
         ]
         
         # Address patterns
         self.address_patterns = [
             r'\b\d+\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\s+(?:Street|St|Avenue|Ave|Road|Rd|Lane|Ln|Drive|Dr|Boulevard|Blvd)\b',
-            r'\bAddress:\s*(.+?)(?:\n|$)',
-            r'\b\d+\s+[A-Z][a-z]+\s+[A-Z][a-z]+,\s*[A-Z][a-z]+\s+\d{5}\b',  # Street address with ZIP
+            r'\b\d+\s+[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\s+(?:Street|St|Avenue|Ave|Road|Rd|Lane|Ln|Drive|Dr|Boulevard|Blvd)(?:\s*,?\s*[A-Z][a-z]+\s*,?\s*[A-Z]{2}\s*\d{5}(?:-\d{4})?)?',
+            r'Address:\s*(.+?)(?:\n|$)',
+            r'\b[A-Z][a-z]+\s*,\s*[A-Z]{2}\s+\d{5}(?:-\d{4})?\b',  # City, State ZIP
         ]
         
         # Phone number patterns
         self.phone_patterns = [
             r'\b(?:\+?1[-.\s]?)?\(?([0-9]{3})\)?[-.\s]?([0-9]{3})[-.\s]?([0-9]{4})\b',
-            r'\bPhone:\s*([0-9\-\.\s\(\)]+)\b',
-            r'\bTel:\s*([0-9\-\.\s\(\)]+)\b',
-            r'\bMobile:\s*([0-9\-\.\s\(\)]+)\b',
+            r'\bPhone:\s*([0-9\-\.\(\)\s]+)\b',
+            r'\bTel:\s*([0-9\-\.\(\)\s]+)\b',
+            r'\bCell:\s*([0-9\-\.\(\)\s]+)\b',
         ]
         
         # Medical ID patterns
         self.medical_id_patterns = [
-            r'\b(?:MRN|Medical Record|Patient ID|ID):\s*([A-Z0-9\-]+)\b',
-            r'\b[A-Z]{2,3}\d{6,10}\b',  # Common medical ID format
-            r'\bNHS\s*(?:Number|No):\s*(\d{3}\s*\d{3}\s*\d{4})\b',  # NHS number
-            r'\b\d{8,12}\b(?=\s*(?:medical|patient|record))',  # Numbers near medical terms
+            r'\b(?:MRN|Medical Record|Patient ID|Chart):\s*([A-Z0-9\-]+)\b',
+            r'\b(?:MR|MRN)#?\s*([A-Z0-9\-]{6,12})\b',
+            r'\bPatient\s+ID:\s*([A-Z0-9\-]+)\b',
+            r'\bChart\s+#:\s*([A-Z0-9\-]+)\b',
         ]
         
         # SSN patterns
         self.ssn_patterns = [
-            r'\b\d{3}-\d{2}-\d{4}\b',  # Standard SSN format
+            r'\b\d{3}-\d{2}-\d{4}\b',
+            r'\b\d{3}\s\d{2}\s\d{4}\b',
             r'\bSSN:\s*(\d{3}[-\s]?\d{2}[-\s]?\d{4})\b',
             r'\bSocial Security:\s*(\d{3}[-\s]?\d{2}[-\s]?\d{4})\b',
         ]
-        
-        # Date patterns (for DOB detection)
-        self.date_patterns = [
-            r'\b(?:DOB|Date of Birth|Born):\s*(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})\b',
-            r'\b(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})\b(?=\s*(?:DOB|Birth))',
-        ]
-        
-        # Common first names for name validation
-        self.common_first_names = {
-            'james', 'mary', 'john', 'patricia', 'robert', 'jennifer', 'michael', 'linda',
-            'william', 'elizabeth', 'david', 'barbara', 'richard', 'susan', 'joseph', 'jessica',
-            'thomas', 'sarah', 'christopher', 'karen', 'charles', 'nancy', 'daniel', 'lisa',
-            'matthew', 'betty', 'anthony', 'helen', 'mark', 'sandra', 'donald', 'donna',
-            'steven', 'carol', 'paul', 'ruth', 'andrew', 'sharon', 'joshua', 'michelle',
-            'kenneth', 'laura', 'kevin', 'sarah', 'brian', 'kimberly', 'george', 'deborah',
-            'edward', 'dorothy', 'ronald', 'lisa', 'timothy', 'nancy', 'jason', 'karen'
-        }
-    
-    def _calculate_confidence(self, match_text: str, pattern_type: str, context: str = "") -> float:
-        """Calculate confidence score for a PII match."""
-        base_confidence = 0.5
-        
-        # Pattern-specific confidence adjustments
-        if pattern_type == 'name':
-            # Higher confidence if it's a common name
-            first_name = match_text.split()[0].lower()
-            if first_name in self.common_first_names:
-                base_confidence += 0.3
-            
-            # Higher confidence if preceded by title or label
-            if re.search(r'(?:Mr|Mrs|Ms|Dr|Patient|Name):\s*$', context):
-                base_confidence += 0.2
-                
-        elif pattern_type == 'phone':
-            # Higher confidence for properly formatted numbers
-            if re.match(r'\(\d{3}\)\s*\d{3}-\d{4}', match_text):
-                base_confidence += 0.3
-            elif re.match(r'\d{3}-\d{3}-\d{4}', match_text):
-                base_confidence += 0.2
-                
-        elif pattern_type == 'ssn':
-            # SSN patterns are usually high confidence
-            base_confidence += 0.4
-            
-        elif pattern_type == 'medical_id':
-            # Medical IDs with labels are high confidence
-            if 'MRN' in context or 'Medical Record' in context:
-                base_confidence += 0.3
-                
-        elif pattern_type == 'address':
-            # Addresses with street indicators are higher confidence
-            if re.search(r'(?:Street|Avenue|Road|Drive)', match_text, re.IGNORECASE):
-                base_confidence += 0.2
-        
-        return min(1.0, base_confidence)
     
     def detect_names(self, text: str) -> List[PIIMatch]:
         """Detect person names in text."""
@@ -113,27 +61,32 @@ class PIIDetector:
         
         for pattern in self.name_patterns:
             for match in re.finditer(pattern, text, re.IGNORECASE):
-                name = match.group(1) if match.groups() else match.group(0)
+                # Extract the actual name from the capture group or full match
+                if match.groups() and match.group(1):
+                    name_text = match.group(1).strip()
+                    start_pos = match.start(1)
+                    end_pos = match.end(1)
+                else:
+                    name_text = match.group(0).strip()
+                    start_pos = match.start()
+                    end_pos = match.end()
                 
-                # Skip if it looks like a medication or medical term
-                if re.search(r'(?:mg|ml|tablet|capsule|dose|daily|twice)', name, re.IGNORECASE):
+                # Skip if name is too short or invalid
+                if len(name_text) < 2:
                     continue
                 
-                # Get context for confidence calculation
-                start_context = text[max(0, match.start()-20):match.start()]
+                # Calculate confidence based on pattern type and context
+                confidence = self._calculate_name_confidence(name_text, pattern, text, start_pos)
                 
-                confidence = self._calculate_confidence(name, 'name', start_context)
-                
-                pii_match = PIIMatch(
-                    text=name,
+                matches.append(PIIMatch(
+                    text=name_text,
                     pii_type='name',
                     confidence=confidence,
-                    start_pos=match.start(),
-                    end_pos=match.end()
-                )
-                matches.append(pii_match)
+                    start_pos=start_pos,
+                    end_pos=end_pos
+                ))
         
-        return matches
+        return self._deduplicate_matches(matches)
     
     def detect_addresses(self, text: str) -> List[PIIMatch]:
         """Detect addresses in text."""
@@ -141,20 +94,26 @@ class PIIDetector:
         
         for pattern in self.address_patterns:
             for match in re.finditer(pattern, text, re.IGNORECASE):
-                address = match.group(1) if match.groups() else match.group(0)
+                if match.groups():
+                    address_text = match.group(1).strip()
+                    start_pos = match.start(1)
+                    end_pos = match.end(1)
+                else:
+                    address_text = match.group(0).strip()
+                    start_pos = match.start()
+                    end_pos = match.end()
                 
-                confidence = self._calculate_confidence(address, 'address')
+                confidence = self._calculate_address_confidence(address_text, pattern)
                 
-                pii_match = PIIMatch(
-                    text=address.strip(),
+                matches.append(PIIMatch(
+                    text=address_text,
                     pii_type='address',
                     confidence=confidence,
-                    start_pos=match.start(),
-                    end_pos=match.end()
-                )
-                matches.append(pii_match)
+                    start_pos=start_pos,
+                    end_pos=end_pos
+                ))
         
-        return matches
+        return self._deduplicate_matches(matches)
     
     def detect_phone_numbers(self, text: str) -> List[PIIMatch]:
         """Detect phone numbers in text."""
@@ -162,51 +121,56 @@ class PIIDetector:
         
         for pattern in self.phone_patterns:
             for match in re.finditer(pattern, text, re.IGNORECASE):
-                phone = match.group(1) if match.groups() else match.group(0)
+                if match.groups():
+                    # For patterns with capture groups, use the first group
+                    phone_text = match.group(1).strip() if len(match.groups()) == 1 else match.group(0).strip()
+                    start_pos = match.start(1) if len(match.groups()) == 1 else match.start()
+                    end_pos = match.end(1) if len(match.groups()) == 1 else match.end()
+                else:
+                    phone_text = match.group(0).strip()
+                    start_pos = match.start()
+                    end_pos = match.end()
                 
-                # Skip if it's clearly not a phone number (too short, etc.)
-                digits_only = re.sub(r'[^\d]', '', phone)
-                if len(digits_only) < 10 or len(digits_only) > 11:
-                    continue
-                
-                confidence = self._calculate_confidence(phone, 'phone')
-                
-                pii_match = PIIMatch(
-                    text=phone,
-                    pii_type='phone',
-                    confidence=confidence,
-                    start_pos=match.start(),
-                    end_pos=match.end()
-                )
-                matches.append(pii_match)
+                # Validate phone number format
+                if self._is_valid_phone_number(phone_text):
+                    confidence = self._calculate_phone_confidence(phone_text, pattern)
+                    
+                    matches.append(PIIMatch(
+                        text=phone_text,
+                        pii_type='phone',
+                        confidence=confidence,
+                        start_pos=start_pos,
+                        end_pos=end_pos
+                    ))
         
-        return matches
+        return self._deduplicate_matches(matches)
     
     def detect_medical_ids(self, text: str) -> List[PIIMatch]:
-        """Detect medical record numbers and IDs."""
+        """Detect medical record numbers and patient IDs."""
         matches = []
         
         for pattern in self.medical_id_patterns:
             for match in re.finditer(pattern, text, re.IGNORECASE):
-                medical_id = match.group(1) if match.groups() else match.group(0)
+                if match.groups():
+                    med_id_text = match.group(1).strip()
+                    start_pos = match.start(1)
+                    end_pos = match.end(1)
+                else:
+                    med_id_text = match.group(0).strip()
+                    start_pos = match.start()
+                    end_pos = match.end()
                 
-                # Get context for confidence calculation
-                start_context = text[max(0, match.start()-20):match.start()]
-                end_context = text[match.end():match.end()+20]
-                context = start_context + end_context
+                confidence = self._calculate_medical_id_confidence(med_id_text, pattern)
                 
-                confidence = self._calculate_confidence(medical_id, 'medical_id', context)
-                
-                pii_match = PIIMatch(
-                    text=medical_id,
+                matches.append(PIIMatch(
+                    text=med_id_text,
                     pii_type='medical_id',
                     confidence=confidence,
-                    start_pos=match.start(),
-                    end_pos=match.end()
-                )
-                matches.append(pii_match)
+                    start_pos=start_pos,
+                    end_pos=end_pos
+                ))
         
-        return matches
+        return self._deduplicate_matches(matches)
     
     def detect_ssns(self, text: str) -> List[PIIMatch]:
         """Detect Social Security Numbers."""
@@ -214,112 +178,165 @@ class PIIDetector:
         
         for pattern in self.ssn_patterns:
             for match in re.finditer(pattern, text):
-                ssn = match.group(1) if match.groups() else match.group(0)
+                if match.groups():
+                    ssn_text = match.group(1).strip()
+                    start_pos = match.start(1)
+                    end_pos = match.end(1)
+                else:
+                    ssn_text = match.group(0).strip()
+                    start_pos = match.start()
+                    end_pos = match.end()
                 
                 # Validate SSN format
-                digits_only = re.sub(r'[^\d]', '', ssn)
-                if len(digits_only) != 9:
-                    continue
-                
-                # Skip obviously invalid SSNs
-                if digits_only.startswith('000') or digits_only[3:5] == '00' or digits_only[5:] == '0000':
-                    continue
-                
-                confidence = self._calculate_confidence(ssn, 'ssn')
-                
-                pii_match = PIIMatch(
-                    text=ssn,
-                    pii_type='ssn',
-                    confidence=confidence,
-                    start_pos=match.start(),
-                    end_pos=match.end()
-                )
-                matches.append(pii_match)
+                if self._is_valid_ssn(ssn_text):
+                    confidence = self._calculate_ssn_confidence(ssn_text, pattern)
+                    
+                    matches.append(PIIMatch(
+                        text=ssn_text,
+                        pii_type='ssn',
+                        confidence=confidence,
+                        start_pos=start_pos,
+                        end_pos=end_pos
+                    ))
         
-        return matches
+        return self._deduplicate_matches(matches)
     
-    def detect_dates_of_birth(self, text: str) -> List[PIIMatch]:
-        """Detect dates of birth (treated as PII)."""
-        matches = []
+    def detect_all_pii(self, text: str) -> List[PIIMatch]:
+        """Detect all types of PII in the given text."""
+        all_matches = []
         
-        for pattern in self.date_patterns:
-            for match in re.finditer(pattern, text, re.IGNORECASE):
-                dob = match.group(1) if match.groups() else match.group(0)
-                
-                confidence = 0.8  # DOB patterns are usually high confidence
-                
-                pii_match = PIIMatch(
-                    text=dob,
-                    pii_type='dob',
-                    confidence=confidence,
-                    start_pos=match.start(),
-                    end_pos=match.end()
-                )
-                matches.append(pii_match)
+        try:
+            all_matches.extend(self.detect_names(text))
+            all_matches.extend(self.detect_addresses(text))
+            all_matches.extend(self.detect_phone_numbers(text))
+            all_matches.extend(self.detect_medical_ids(text))
+            all_matches.extend(self.detect_ssns(text))
+            
+            # Sort by position in text
+            all_matches.sort(key=lambda x: x.start_pos)
+            
+            logger.info(f"Detected {len(all_matches)} PII matches in text")
+            
+        except Exception as e:
+            logger.error(f"Error during PII detection: {e}")
+            raise
         
-        return matches
+        return all_matches
     
-    def _remove_overlapping_matches(self, matches: List[PIIMatch]) -> List[PIIMatch]:
-        """Remove overlapping PII matches, keeping the highest confidence ones."""
+    def _calculate_name_confidence(self, name_text: str, pattern: str, full_text: str, position: int) -> float:
+        """Calculate confidence score for name detection."""
+        confidence = 0.5  # Base confidence
+        
+        # Higher confidence for names with titles or labels
+        if any(indicator in pattern for indicator in ['Mr|Mrs|Ms|Dr', 'Name:', 'Patient:']):
+            confidence += 0.3
+        
+        # Higher confidence for names near medical context
+        context_window = full_text[max(0, position-50):position+50]
+        medical_keywords = ['patient', 'doctor', 'medical', 'chart', 'record', 'dob', 'age']
+        if any(keyword in context_window.lower() for keyword in medical_keywords):
+            confidence += 0.2
+        
+        # Adjust for name length and format
+        if len(name_text.split()) >= 2:  # First and last name
+            confidence += 0.1
+        
+        return min(confidence, 1.0)
+    
+    def _calculate_address_confidence(self, address_text: str, pattern: str) -> float:
+        """Calculate confidence score for address detection."""
+        confidence = 0.6  # Base confidence
+        
+        # Higher confidence for complete addresses with street numbers
+        if re.search(r'\d+', address_text):
+            confidence += 0.2
+        
+        # Higher confidence for addresses with state/ZIP
+        if re.search(r'[A-Z]{2}\s+\d{5}', address_text):
+            confidence += 0.2
+        
+        return min(confidence, 1.0)
+    
+    def _calculate_phone_confidence(self, phone_text: str, pattern: str) -> float:
+        """Calculate confidence score for phone number detection."""
+        confidence = 0.7  # Base confidence
+        
+        # Higher confidence for labeled phone numbers
+        if 'Phone:' in pattern or 'Tel:' in pattern:
+            confidence += 0.2
+        
+        # Higher confidence for properly formatted numbers
+        if re.match(r'\(\d{3}\)\s?\d{3}-\d{4}', phone_text):
+            confidence += 0.1
+        
+        return min(confidence, 1.0)
+    
+    def _calculate_medical_id_confidence(self, med_id_text: str, pattern: str) -> float:
+        """Calculate confidence score for medical ID detection."""
+        confidence = 0.8  # Base confidence (medical IDs are usually well-labeled)
+        
+        # Higher confidence for explicit labels
+        if any(label in pattern for label in ['MRN:', 'Medical Record', 'Patient ID']):
+            confidence += 0.1
+        
+        return min(confidence, 1.0)
+    
+    def _calculate_ssn_confidence(self, ssn_text: str, pattern: str) -> float:
+        """Calculate confidence score for SSN detection."""
+        confidence = 0.9  # Base confidence (SSNs have distinctive format)
+        
+        # Higher confidence for labeled SSNs
+        if 'SSN:' in pattern or 'Social Security' in pattern:
+            confidence += 0.1
+        
+        return min(confidence, 1.0)
+    
+    def _is_valid_phone_number(self, phone_text: str) -> bool:
+        """Validate phone number format."""
+        # Remove all non-digits
+        digits_only = re.sub(r'\D', '', phone_text)
+        
+        # Valid US phone numbers have 10 or 11 digits (with country code)
+        return len(digits_only) in [10, 11]
+    
+    def _is_valid_ssn(self, ssn_text: str) -> bool:
+        """Validate SSN format."""
+        # Remove all non-digits
+        digits_only = re.sub(r'\D', '', ssn_text)
+        
+        # Valid SSNs have exactly 9 digits and don't start with 000, 666, or 9xx
+        if len(digits_only) != 9:
+            return False
+        
+        area_number = digits_only[:3]
+        if area_number in ['000', '666'] or area_number.startswith('9'):
+            return False
+        
+        return True
+    
+    def _deduplicate_matches(self, matches: List[PIIMatch]) -> List[PIIMatch]:
+        """Remove duplicate matches based on position overlap."""
         if not matches:
             return matches
         
         # Sort by start position
-        sorted_matches = sorted(matches, key=lambda x: x.start_pos)
+        matches.sort(key=lambda x: x.start_pos)
         
-        filtered_matches = []
-        for match in sorted_matches:
+        deduplicated = []
+        for match in matches:
             # Check if this match overlaps with any existing match
             overlaps = False
-            for existing in filtered_matches:
-                if (match.start_pos < existing.end_pos and match.end_pos > existing.start_pos):
-                    # There's an overlap - keep the higher confidence match
+            for existing in deduplicated:
+                if (match.start_pos < existing.end_pos and 
+                    match.end_pos > existing.start_pos):
+                    # Keep the match with higher confidence
                     if match.confidence > existing.confidence:
-                        filtered_matches.remove(existing)
-                        filtered_matches.append(match)
+                        deduplicated.remove(existing)
+                        deduplicated.append(match)
                     overlaps = True
                     break
             
             if not overlaps:
-                filtered_matches.append(match)
+                deduplicated.append(match)
         
-        return filtered_matches
-    
-    def detect_all_pii(self, text: str) -> List[PIIMatch]:
-        """
-        Detect all types of PII in text.
-        
-        Returns:
-            List of PIIMatch objects sorted by position
-        """
-        if not text:
-            return []
-        
-        all_matches = []
-        
-        # Detect each type of PII
-        all_matches.extend(self.detect_names(text))
-        all_matches.extend(self.detect_addresses(text))
-        all_matches.extend(self.detect_phone_numbers(text))
-        all_matches.extend(self.detect_medical_ids(text))
-        all_matches.extend(self.detect_ssns(text))
-        all_matches.extend(self.detect_dates_of_birth(text))
-        
-        # Remove overlapping matches
-        filtered_matches = self._remove_overlapping_matches(all_matches)
-        
-        # Sort by position
-        filtered_matches.sort(key=lambda x: x.start_pos)
-        
-        logger.info(f"Detected {len(filtered_matches)} PII elements in text")
-        
-        return filtered_matches
-    
-    def get_pii_summary(self, matches: List[PIIMatch]) -> Dict[str, int]:
-        """Get a summary of detected PII types."""
-        summary = {}
-        for match in matches:
-            pii_type = match.pii_type
-            summary[pii_type] = summary.get(pii_type, 0) + 1
-        
-        return summary
+        return deduplicated

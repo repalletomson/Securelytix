@@ -1,0 +1,167 @@
+{
+  "success": true,
+  "original_text": "MEDICAL RECORD\n\nPatient: Dr. John Smith\nDate of Birth: 01/15/1980\nAddress: 123 Main Street, Anytown, CA 90210\nPhone: (555) 123-4567\nSSN: 123-45-6789\nMRN: MED789123\n\nChief Complaint: Annual checkup\nDiagnosis: Patient appears healthy\nTreatment: Continue current medications\n\nEmergency Contact: Jane Smith (555) 987-6543",
+  "pii_matches": [
+    {
+      "text": "John Smith",
+      "type": "name",
+      "confidence": 0.95,
+      "position": {
+        "start": 29,
+        "end": 39
+      }
+    },
+    {
+      "text": "Main Street",
+      "type": "name",
+      "confidence": 0.95,
+      "position": {
+        "start": 79,
+        "end": 90
+      }
+    },
+    {
+      "text": "Chief Complaint",
+      "type": "name",
+      "confidence": 0.95,
+      "position": {
+        "start": 165,
+        "end": 180
+      }
+    },
+    {
+      "text": "Emergency Contact",
+      "type": "name",
+      "confidence": 0.95,
+      "position": {
+        "start": 273,
+        "end": 290
+      }
+    },
+    {
+      "text": "Jane Smith",
+      "type": "name",
+      "confidence": 0.95,
+      "position": {
+        "start": 292,
+        "end": 302
+      }
+    },
+    {
+      "text": "555) 123-4567",
+      "type": "phone",
+      "confidence": 0.9,
+      "position": {
+        "start": 118,
+        "end": 131
+      }
+    },
+    {
+      "text": "555) 987-6543",
+      "type": "phone",
+      "confidence": 0.9,
+      "position": {
+        "start": 304,
+        "end": 317
+      }
+    },
+    {
+      "text": "123-45-6789",
+      "type": "ssn",
+      "confidence": 0.98,
+      "position": {
+        "start": 137,
+        "end": 148
+      }
+    },
+    {
+      "text": "MED789123",
+      "type": "medical_id",
+      "confidence": 0.92,
+      "position": {
+        "start": 154,
+        "end": 163
+      }
+    }
+  ],
+  "pii_summary": {
+    "total_matches": 9,
+    "by_type": {
+      "name": 5,
+      "phone": 2,
+      "ssn": 1,
+      "medical_id": 1
+    },
+    "confidence_stats": {
+      "average": 0.9388888888888888,
+      "min": 0.9,
+      "max": 0.98
+    }
+  },
+  "processing_metadata": {
+    "input_file": "pipeline_demo_results\\medical_record_original.jpg",
+    "pipeline_version": "1.0.0",
+    "processing_stages": [
+      "preprocessing",
+      "ocr",
+      "text_cleaning",
+      "pii_detection",
+      "redaction"
+    ],
+    "preprocessing": {
+      "duration_seconds": 4.9114227294921875e-05,
+      "operations_applied": [
+        "contrast_enhancement",
+        "noise_reduction"
+      ],
+      "skew_corrected": false,
+      "original_shape": null,
+      "success": true
+    },
+    "ocr": {
+      "duration_seconds": 3.361701965332031e-05,
+      "engine_used": "tesseract",
+      "engines_tried": [
+        "tesseract"
+      ],
+      "fallback_used": false,
+      "confidence_score": 0.92,
+      "text_length": 317,
+      "success": true
+    },
+    "text_cleaning": {
+      "duration_seconds": 6.318092346191406e-05,
+      "quality_metrics": {
+        "overall_quality": 0.88,
+        "character_accuracy": 0.95,
+        "word_accuracy": 0.9
+      },
+      "quality_score": 0.88,
+      "original_length": 317,
+      "cleaned_length": 317,
+      "success": true
+    },
+    "pii_detection": {
+      "duration_seconds": 2.86102294921875e-05,
+      "matches_found": 9,
+      "types_detected": [
+        "phone",
+        "medical_id",
+        "name",
+        "ssn"
+      ],
+      "success": true
+    },
+    "redaction": {
+      "duration_seconds": 0.024960756301879883,
+      "method": "black_box",
+      "output_path": "pipeline_demo_results\\redacted_medical_record_original.jpg",
+      "pii_redacted": 9,
+      "success": true
+    },
+    "total_duration_seconds": 0.025257110595703125,
+    "success": true
+  },
+  "redacted_image_path": "pipeline_demo_results\\redacted_medical_record_original.jpg",
+  "generated_at": "2025-12-10T13:11:32.426242+00:00"
+}

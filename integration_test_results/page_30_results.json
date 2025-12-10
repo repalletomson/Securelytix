@@ -1,0 +1,332 @@
+{
+  "success": true,
+  "original_text": "8 OF of '0' PLANOQE CARE 964 Sex: PNo Age: 19 ~M Bed No: 3 CIWA Dept No: 4 Pr Rcason Reskants N Te :K~ \"lwlex 24 MFT Lf r4 IN Tr] Tin 0(900) ImB n 4lov? 2 (k 4 Tube Fceds Faslng Dlet Nomma sot Lquid Consiistcncy Lowsal (Normal Diabutic Type cae 0 6 Consulant 8gnatur pp Mopile Na Mou No: Dale; Tme: Date\" Time HOSPITAL SCIENCES MEDICAL Sciences) Medical INSTITUTE ANUSANDHAN (Faculty UNIVERSITYI SIKSHA Bhubaneswar (DEEMED Nagar; Kalinga REPORT K-8 PROGRESS 97135\" TREATMENTIADVICE Name: UHID Palient nvd-1 PROGRESS Opd DATE To Ax (200) Menital TI UIE Takin (lamp) sa Muu Lope Buim NccT rk 445 Other Hiranmaya Rezd Nol843 (Conid. Dopt Signature Resident wtr Name Full Mabile =",
+  "pii_matches": [
+    {
+      "text": "PLANOQE CARE",
+      "type": "name",
+      "confidence": 0.7999999999999999,
+      "position": {
+        "start": 12,
+        "end": 24
+      }
+    },
+    {
+      "text": "PNo Age",
+      "type": "name",
+      "confidence": 0.7999999999999999,
+      "position": {
+        "start": 34,
+        "end": 41
+      }
+    },
+    {
+      "text": "CIWA Dept",
+      "type": "name",
+      "confidence": 0.7999999999999999,
+      "position": {
+        "start": 59,
+        "end": 68
+      }
+    },
+    {
+      "text": "Rcason Reskants",
+      "type": "name",
+      "confidence": 0.7999999999999999,
+      "position": {
+        "start": 78,
+        "end": 93
+      }
+    },
+    {
+      "text": "Tube Fceds",
+      "type": "name",
+      "confidence": 0.6,
+      "position": {
+        "start": 160,
+        "end": 170
+      }
+    },
+    {
+      "text": "Faslng Dlet",
+      "type": "name",
+      "confidence": 0.6,
+      "position": {
+        "start": 171,
+        "end": 182
+      }
+    },
+    {
+      "text": "Nomma sot",
+      "type": "name",
+      "confidence": 0.6,
+      "position": {
+        "start": 183,
+        "end": 192
+      }
+    },
+    {
+      "text": "Lquid Consiistcncy",
+      "type": "name",
+      "confidence": 0.6,
+      "position": {
+        "start": 193,
+        "end": 211
+      }
+    },
+    {
+      "text": "Normal Diabutic",
+      "type": "name",
+      "confidence": 0.6,
+      "position": {
+        "start": 220,
+        "end": 235
+      }
+    },
+    {
+      "text": "Type cae",
+      "type": "name",
+      "confidence": 0.6,
+      "position": {
+        "start": 236,
+        "end": 244
+      }
+    },
+    {
+      "text": "Time HOSPITAL",
+      "type": "name",
+      "confidence": 0.7999999999999999,
+      "position": {
+        "start": 305,
+        "end": 318
+      }
+    },
+    {
+      "text": "SCIENCES MEDICAL",
+      "type": "name",
+      "confidence": 0.7999999999999999,
+      "position": {
+        "start": 319,
+        "end": 335
+      }
+    },
+    {
+      "text": "Medical INSTITUTE",
+      "type": "name",
+      "confidence": 0.7999999999999999,
+      "position": {
+        "start": 346,
+        "end": 363
+      }
+    },
+    {
+      "text": "Faculty UNIVERSITYI",
+      "type": "name",
+      "confidence": 0.7999999999999999,
+      "position": {
+        "start": 376,
+        "end": 395
+      }
+    },
+    {
+      "text": "SIKSHA Bhubaneswar",
+      "type": "name",
+      "confidence": 0.7999999999999999,
+      "position": {
+        "start": 396,
+        "end": 414
+      }
+    },
+    {
+      "text": "DEEMED Nagar",
+      "type": "name",
+      "confidence": 0.6,
+      "position": {
+        "start": 416,
+        "end": 428
+      }
+    },
+    {
+      "text": "Kalinga REPORT",
+      "type": "name",
+      "confidence": 0.6,
+      "position": {
+        "start": 430,
+        "end": 444
+      }
+    },
+    {
+      "text": "TREATMENTIADVICE Name",
+      "type": "name",
+      "confidence": 0.6,
+      "position": {
+        "start": 465,
+        "end": 486
+      }
+    },
+    {
+      "text": "UHID Palient",
+      "type": "name",
+      "confidence": 0.9,
+      "position": {
+        "start": 488,
+        "end": 500
+      }
+    },
+    {
+      "text": "PROGRESS Opd",
+      "type": "name",
+      "confidence": 0.6,
+      "position": {
+        "start": 507,
+        "end": 519
+      }
+    },
+    {
+      "text": "UIE Takin",
+      "type": "name",
+      "confidence": 0.6,
+      "position": {
+        "start": 548,
+        "end": 557
+      }
+    },
+    {
+      "text": "Muu Lope",
+      "type": "name",
+      "confidence": 0.6,
+      "position": {
+        "start": 568,
+        "end": 576
+      }
+    },
+    {
+      "text": "Buim NccT",
+      "type": "name",
+      "confidence": 0.6,
+      "position": {
+        "start": 577,
+        "end": 586
+      }
+    },
+    {
+      "text": "Other Hiranmaya",
+      "type": "name",
+      "confidence": 0.6,
+      "position": {
+        "start": 594,
+        "end": 609
+      }
+    },
+    {
+      "text": "Dopt Signature",
+      "type": "name",
+      "confidence": 0.6,
+      "position": {
+        "start": 630,
+        "end": 644
+      }
+    },
+    {
+      "text": "Resident wtr",
+      "type": "name",
+      "confidence": 0.6,
+      "position": {
+        "start": 645,
+        "end": 657
+      }
+    },
+    {
+      "text": "Name Full",
+      "type": "name",
+      "confidence": 0.6,
+      "position": {
+        "start": 658,
+        "end": 667
+      }
+    }
+  ],
+  "pii_summary": {
+    "total_matches": 27,
+    "by_type": {
+      "name": 27
+    },
+    "confidence_stats": {
+      "average": 0.6777777777777778,
+      "min": 0.6,
+      "max": 0.9
+    }
+  },
+  "processing_metadata": {
+    "input_file": "data/samples/page_30.jpg",
+    "pipeline_version": "1.0.0",
+    "processing_stages": [
+      "preprocessing",
+      "ocr",
+      "text_cleaning",
+      "pii_detection",
+      "redaction"
+    ],
+    "preprocessing": {
+      "duration_seconds": 1.5531435012817383,
+      "operations_applied": [
+        "contrast_enhancement",
+        "noise_reduction",
+        "orientation_correction"
+      ],
+      "skew_corrected": true,
+      "original_shape": [
+        2366,
+        3488,
+        3
+      ],
+      "success": true
+    },
+    "ocr": {
+      "duration_seconds": 43.808290004730225,
+      "engine_used": "easyocr",
+      "engines_tried": [
+        "tesseract",
+        "easyocr"
+      ],
+      "fallback_used": true,
+      "confidence_score": 0.7057574167904602,
+      "text_length": 692,
+      "success": true
+    },
+    "text_cleaning": {
+      "duration_seconds": 0.004710197448730469,
+      "quality_metrics": {
+        "quality_score": 0.5366257225433526,
+        "word_retention": 0.9375,
+        "char_reduction": 0.023121387283236983,
+        "medical_score": 0.2,
+        "structure_score": 0.0,
+        "medical_terms_found": 2
+      },
+      "quality_score": 0.0,
+      "original_length": 692,
+      "cleaned_length": 676,
+      "success": true
+    },
+    "pii_detection": {
+      "duration_seconds": 0.0017919540405273438,
+      "matches_found": 27,
+      "types_detected": [
+        "name"
+      ],
+      "success": true
+    },
+    "redaction": {
+      "duration_seconds": 0.11565923690795898,
+      "method": "black_box",
+      "output_path": "integration_test_results\\redacted_page_30.jpg",
+      "pii_redacted": 27,
+      "success": true
+    },
+    "total_duration_seconds": 45.48416876792908,
+    "success": true
+  },
+  "redacted_image_path": "integration_test_results\\redacted_page_30.jpg",
+  "generated_at": "2025-12-10T13:23:55.377961+00:00"
+}
