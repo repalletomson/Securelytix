@@ -1,0 +1,9 @@
+opencv-python
+pytesseract
+numpy
+Pillow
+regex
+easyocr
+matplotlib
+pytest
+hypothesis
